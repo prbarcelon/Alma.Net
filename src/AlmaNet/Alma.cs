@@ -21,7 +21,7 @@ namespace AlmaNet
     {
         public static PadModel ToPadModel(in this OceanModel o)
         {
-            var pleasure = 0.21f * o.Extraversion
+            var pleasure = 0.21f * o.Extroversion
                            + 0.59f * o.Agreeableness
                            + 0.19f * o.Neuroticism;
 
@@ -31,7 +31,7 @@ namespace AlmaNet
 
             var dominance = 0.25f * o.Openness
                             + 0.17f * o.Conscientiousness
-                            + 0.60f * o.Extraversion
+                            + 0.60f * o.Extroversion
                             - 0.32f * o.Agreeableness;
 
             var padModel = new PadModel(pleasure, arousal, dominance);
