@@ -1,6 +1,7 @@
 ﻿using System;
 using AlmaNet.Emotion;
 using AlmaNet.Personality;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace AlmaNet
 {
@@ -47,7 +48,7 @@ namespace AlmaNet
         {
             float p, a, d, sumIntensity;
             p = a = d = sumIntensity = 0.0f;
-            
+
             foreach (var activeEmotion in activeEmotions)
             {
                 var pad = activeEmotion.Emotion.MapToPadSpace();
@@ -119,6 +120,72 @@ namespace AlmaNet
                 EmotionType.Shame => new PadModel(-0.3f, 0.1f, -0.6f),
                 _ => throw new ArgumentOutOfRangeException(nameof(emotion), emotion, null)
             };
+        }
+
+        public static PadModel ApplyPushPull(this PadModel mood, VirtualEmotionCenter virtualEmotionCenter,
+            int secondsElapsed = 1)
+        {
+            // "This defines the amount of time the pull and push mood change function needs to move a current
+            // mood from one mood octant center to another one, presumably that a suitable virtual emotion
+            // center exists that long, what is usually not the case. Our character’s usual mood change time
+            // is 10 minutes."
+            //
+            // Gebhard, Patrick. (2005). ALMA: a layered model of affect. 29-36. 
+            const float speedOfMoodChange = 1.0f / (10 * 60); // 0.00167 units/second
+
+            var emotionCenter = virtualEmotionCenter.Center.ToVector();
+            var currentMood = mood.ToVector();
+
+            if (IsPullPhase(emotionCenter, currentMood))
+            {
+                // TODO - handle case where secondsElapsed is too high and pull overshoots center.
+                var pullDirection = emotionCenter.Subtract(currentMood).Normalize(2);
+                var pullAmount = speedOfMoodChange * secondsElapsed;
+                var pullVector = pullDirection.Multiply(pullAmount);
+                var nextMood = currentMood.Add(pullVector).ToPadModel();
+                return nextMood;
+            }
+            else
+            {
+                var pushDirection = emotionCenter.Normalize(2);
+                var pushAmount = speedOfMoodChange * secondsElapsed;
+                var pushVector = pushDirection.Multiply(pushAmount);
+                var nextMood = currentMood.Add(pushVector).ToPadModel();
+                return nextMood;
+            }
+        }
+
+        private static bool IsPullPhase(Vector<float> emotionCenter, Vector<float> currentMood)
+        {
+            var emotionCenterNorm = (float) emotionCenter.L2Norm();
+            var projectionOfCurrentMoodOntoEmotionCenter =
+                emotionCenter.Multiply(emotionCenter.DotProduct(currentMood) / (emotionCenterNorm * emotionCenterNorm));
+            var moodProjectionNorm = (float) projectionOfCurrentMoodOntoEmotionCenter.L2Norm();
+            var isCurrentMoodBetweenZeroPointAndVirtualEmotionCenter = moodProjectionNorm < emotionCenterNorm;
+            return isCurrentMoodBetweenZeroPointAndVirtualEmotionCenter;
+        }
+
+        public static PadModel ApplyReturnToDefaultMood(this PadModel mood, PadModel defaultMood,
+            int secondsElapsed = 1)
+        {
+            // "Another aspect of our mood simulation is that the current mood has a tendency to slowly move back to
+            // the default mood. Generally, the return time depends how far the current mood is away from the default
+            // mood. We take the longest distance of a mood octant (√3) for defining the mood return time. Currently
+            // this is 20 minutes.
+            //
+            // Gebhard, Patrick. (2005). ALMA: a layered model of affect. 29-36.
+            const float sqrt3 = 1.7320508075688772935274463415059f;
+            const float speedOfMoodChange = sqrt3 / (20 * 60); // 0.00083 units/second
+
+            var targetMood = defaultMood.ToVector();
+            var currentMood = mood.ToVector();
+
+            // TODO - handle case where secondsElapsed is too high and pull overshoots.
+            var pullDirection = targetMood.Subtract(currentMood).Normalize(2);
+            var pullAmount = speedOfMoodChange * secondsElapsed;
+            var pullVector = pullDirection.Multiply(pullAmount);
+            var nextMood = currentMood.Add(pullVector).ToPadModel();
+            return nextMood;
         }
     }
 }
