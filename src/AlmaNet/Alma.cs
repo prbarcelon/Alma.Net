@@ -4,19 +4,6 @@ using AlmaNet.Personality;
 
 namespace AlmaNet
 {
-    public enum PadMoodOctant
-    {
-        Unknown = 0,
-        Exuberant,
-        Dependent,
-        Relaxed,
-        Docile,
-        Bored,
-        Disdainful,
-        Anxious,
-        Hostile
-    }
-
     public static class Alma
     {
         public static PadModel ToPadModel(in this OceanModel o)
@@ -56,10 +43,24 @@ namespace AlmaNet
         /// </summary>
         /// <param name="activeEmotions"></param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public static PadModel GetVirtualEmotionCenter(this PadModel[] activeEmotions)
+        public static VirtualEmotionCenter GetVirtualEmotionCenter(this EmotionAndIntensity[] activeEmotions)
         {
-            throw new NotImplementedException();
+            float p, a, d, sumIntensity;
+            p = a = d = sumIntensity = 0.0f;
+            
+            foreach (var activeEmotion in activeEmotions)
+            {
+                var pad = activeEmotion.Emotion.MapToPadSpace();
+                p += pad.Pleasure;
+                a += pad.Arousal;
+                d += pad.Dominance;
+                sumIntensity += activeEmotion.Intensity.Value;
+            }
+
+            var averageIntensity = sumIntensity / activeEmotions.Length;
+            var clampedIntensity = new Intensity(averageIntensity.Clamp(1.0f, 0.0f));
+            var center = new PadModel(p.Clamp(), a.Clamp(), d.Clamp());
+            return new VirtualEmotionCenter(center, clampedIntensity);
         }
 
         /// <summary>
@@ -67,24 +68,57 @@ namespace AlmaNet
         /// </summary>
         /// <param name="emotion"></param>
         /// <returns></returns>
-        public static PadMoodOctant ToMood(this PadModel emotion)
+        public static PadMoodOctants ToMood(this PadModel emotion)
         {
             var padMoodOctant = emotion switch
             {
-                var m when m.Pleasure > 0 && m.Arousal > 0 && m.Dominance > 0 => PadMoodOctant.Exuberant,
-                var m when m.Pleasure > 0 && m.Arousal > 0 && m.Dominance < 0 => PadMoodOctant.Dependent,
-                var m when m.Pleasure > 0 && m.Arousal < 0 && m.Dominance > 0 => PadMoodOctant.Relaxed,
-                var m when m.Pleasure > 0 && m.Arousal < 0 && m.Dominance < 0 => PadMoodOctant.Docile,
-                
-                var m when m.Pleasure < 0 && m.Arousal < 0 && m.Dominance < 0 => PadMoodOctant.Bored,
-                var m when m.Pleasure < 0 && m.Arousal < 0 && m.Dominance > 0 => PadMoodOctant.Disdainful,
-                var m when m.Pleasure < 0 && m.Arousal > 0 && m.Dominance < 0 => PadMoodOctant.Anxious,
-                var m when m.Pleasure < 0 && m.Arousal > 0 && m.Dominance > 0 => PadMoodOctant.Hostile,
-                
-                _ => PadMoodOctant.Unknown
+                var m when m.Pleasure > 0 && m.Arousal > 0 && m.Dominance > 0 => PadMoodOctants.Exuberant,
+                var m when m.Pleasure > 0 && m.Arousal > 0 && m.Dominance < 0 => PadMoodOctants.Dependent,
+                var m when m.Pleasure > 0 && m.Arousal < 0 && m.Dominance > 0 => PadMoodOctants.Relaxed,
+                var m when m.Pleasure > 0 && m.Arousal < 0 && m.Dominance < 0 => PadMoodOctants.Docile,
+
+                var m when m.Pleasure < 0 && m.Arousal < 0 && m.Dominance < 0 => PadMoodOctants.Bored,
+                var m when m.Pleasure < 0 && m.Arousal < 0 && m.Dominance > 0 => PadMoodOctants.Disdainful,
+                var m when m.Pleasure < 0 && m.Arousal > 0 && m.Dominance < 0 => PadMoodOctants.Anxious,
+                var m when m.Pleasure < 0 && m.Arousal > 0 && m.Dominance > 0 => PadMoodOctants.Hostile,
+
+                _ => PadMoodOctants.Unknown
             };
 
             return padMoodOctant;
+        }
+
+        public static PadModel MapToPadSpace(this EmotionType emotion)
+        {
+            return emotion switch
+            {
+                EmotionType.None => new PadModel(),
+                EmotionType.Admiration => new PadModel(0.5f, 0.3f, -0.2f),
+                EmotionType.Anger => new PadModel(-0.51f, 0.59f, 0.25f),
+                EmotionType.Disliking => new PadModel(-0.4f, 0.2f, 0.1f),
+                EmotionType.Disappointment => new PadModel(-0.3f, 0.1f, -0.4f),
+                EmotionType.Distress => new PadModel(-0.4f, -0.2f, -0.5f),
+                EmotionType.Fear => new PadModel(-0.64f, 0.60f, -0.43f),
+                EmotionType.FearsConfirmed => new PadModel(-0.5f, -0.3f, -0.7f),
+                EmotionType.Gloating => new PadModel(0.3f, -0.3f, -0.1f),
+                EmotionType.Gratification => new PadModel(0.6f, 0.5f, 0.4f),
+                EmotionType.Gratitude => new PadModel(0.4f, 0.2f, -0.3f),
+                EmotionType.HappyFor => new PadModel(0.4f, 0.2f, 0.2f),
+                EmotionType.Hate => new PadModel(-0.6f, 0.6f, 0.3f),
+                EmotionType.Hope => new PadModel(0.2f, 0.2f, -0.1f),
+                EmotionType.Joy => new PadModel(0.4f, 0.2f, 0.1f),
+                EmotionType.Liking => new PadModel(0.4f, 0.16f, -0.24f),
+                EmotionType.Love => new PadModel(0.3f, 0.1f, 0.2f),
+                EmotionType.Pity => new PadModel(-0.4f, -0.2f, -0.5f),
+                EmotionType.Pride => new PadModel(0.4f, 0.3f, 0.3f),
+                EmotionType.Relief => new PadModel(0.2f, -0.3f, 0.4f),
+                EmotionType.Remorse => new PadModel(-0.3f, 0.1f, -0.6f),
+                EmotionType.Reproach => new PadModel(-0.3f, -0.1f, 0.4f),
+                EmotionType.Resentment => new PadModel(-0.2f, -0.3f, -0.2f),
+                EmotionType.Satisfaction => new PadModel(0.3f, -0.2f, 0.4f),
+                EmotionType.Shame => new PadModel(-0.3f, 0.1f, -0.6f),
+                _ => throw new ArgumentOutOfRangeException(nameof(emotion), emotion, null)
+            };
         }
     }
 }
