@@ -2,8 +2,9 @@
 {
     public readonly struct OceanModel
     {
-        public OceanModel(float openness, float conscientiousness, float extroversion, float agreeableness,
-            float neuroticism)
+        public OceanModel(FloatNegativeOneToPositiveOne openness, FloatNegativeOneToPositiveOne conscientiousness,
+            FloatNegativeOneToPositiveOne extroversion, FloatNegativeOneToPositiveOne agreeableness,
+            FloatNegativeOneToPositiveOne neuroticism)
         {
             Openness = openness;
             Conscientiousness = conscientiousness;
@@ -12,11 +13,11 @@
             Neuroticism = neuroticism;
         }
 
-        public float Openness { get; }
-        public float Conscientiousness { get; }
-        public float Extroversion { get; }
-        public float Agreeableness { get; }
-        public float Neuroticism { get; }
+        public FloatNegativeOneToPositiveOne Openness { get; }
+        public FloatNegativeOneToPositiveOne Conscientiousness { get; }
+        public FloatNegativeOneToPositiveOne Extroversion { get; }
+        public FloatNegativeOneToPositiveOne Agreeableness { get; }
+        public FloatNegativeOneToPositiveOne Neuroticism { get; }
 
         public override string ToString()
         {
