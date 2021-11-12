@@ -114,78 +114,48 @@ namespace AlmaNet.Test
         public void CalculateNewMood_WhenCurrentMoodIsInPullPhase()
         {
             // Arrange
-            var emotions = new[]
-            {
-                new EmotionAndIntensity(EmotionType.Hope, 0.5f),
-                new EmotionAndIntensity(EmotionType.Admiration, 1.0f)
-            };
-            var virtualEmotionCenter = emotions.GetVirtualEmotionCenter();
-            virtualEmotionCenter.Intensity.Value.Should().BeApproximately(0.75f, 1e-2f);
-            virtualEmotionCenter.Center.Pleasure.Should().BeApproximately(0.7f, 1e-2f);
-            virtualEmotionCenter.Center.Arousal.Should().BeApproximately(0.5f, 1e-2f);
-            virtualEmotionCenter.Center.Dominance.Should().BeApproximately(-0.3f, 1e-2f);
-
+            var virtualEmotionCenter = new VirtualEmotionCenter(new PadModel(0.5f, 0, 0), new Intensity(0.5f));
             var initialMood = new PadModel();
 
             // Act
-            var finalMood = initialMood.ApplyPushPull(virtualEmotionCenter, 600);
+            var finalMood = initialMood.ApplyPushPull(virtualEmotionCenter, 300);
 
             // Assert
-            finalMood.Pleasure.Should().BeApproximately(1.0f, 1e-2f);
-            finalMood.Arousal.Should().BeApproximately(1.0f, 1e-2f);
-            finalMood.Dominance.Should().BeApproximately(0.26f, 1e-2f);
+            finalMood.Pleasure.Should().BeApproximately(0.25f, 1e-2f);
+            finalMood.Arousal.Should().BeApproximately(0, 1e-2f);
+            finalMood.Dominance.Should().BeApproximately(0, 1e-2f);
         }
 
         [Fact]
         public void CalculateNewMood_WhenCurrentMoodIsInPushPhase()
         {
             // Arrange
-            var emotions = new[]
-            {
-                new EmotionAndIntensity(EmotionType.Hope, 0.5f),
-                new EmotionAndIntensity(EmotionType.Admiration, 1.0f)
-            };
-            var virtualEmotionCenter = emotions.GetVirtualEmotionCenter();
-            virtualEmotionCenter.Intensity.Value.Should().BeApproximately(0.75f, 1e-2f);
-            virtualEmotionCenter.Center.Pleasure.Should().BeApproximately(0.7f, 1e-2f);
-            virtualEmotionCenter.Center.Arousal.Should().BeApproximately(0.5f, 1e-2f);
-            virtualEmotionCenter.Center.Dominance.Should().BeApproximately(-0.3f, 1e-2f);
-
-            var initialMood = new PadModel();
+            var virtualEmotionCenter = new VirtualEmotionCenter(new PadModel(1.0f, 0, 0), new Intensity(0.5f));
+            var initialMood = new PadModel(0.5f, 0, 0);
 
             // Act
-            var finalMood = initialMood.ApplyPushPull(virtualEmotionCenter, 600);
+            var finalMood = initialMood.ApplyPushPull(virtualEmotionCenter, 300);
 
             // Assert
-            finalMood.Pleasure.Should().BeApproximately(1.0f, 1e-2f);
-            finalMood.Arousal.Should().BeApproximately(1.0f, 1e-2f);
-            finalMood.Dominance.Should().BeApproximately(0.26f, 1e-2f);
+            finalMood.Pleasure.Should().BeApproximately(0.75f, 1e-2f);
+            finalMood.Arousal.Should().BeApproximately(0, 1e-2f);
+            finalMood.Dominance.Should().BeApproximately(0, 1e-2f);
         }
 
         [Fact]
         public void CalculateNewMood_WhenMovingToDefaultMood()
         {
             // Arrange
-            var emotions = new[]
-            {
-                new EmotionAndIntensity(EmotionType.Hope, 0.5f),
-                new EmotionAndIntensity(EmotionType.Admiration, 1.0f)
-            };
-            var virtualEmotionCenter = emotions.GetVirtualEmotionCenter();
-            virtualEmotionCenter.Intensity.Value.Should().BeApproximately(0.75f, 1e-2f);
-            virtualEmotionCenter.Center.Pleasure.Should().BeApproximately(0.7f, 1e-2f);
-            virtualEmotionCenter.Center.Arousal.Should().BeApproximately(0.5f, 1e-2f);
-            virtualEmotionCenter.Center.Dominance.Should().BeApproximately(-0.3f, 1e-2f);
             var defaultMood = new PadModel();
-            var intermediateMood = defaultMood.ApplyPushPull(virtualEmotionCenter, 600);
+            var initialMood = new PadModel(1f, 0, 0);
 
             // Act
-            var finalMood = intermediateMood.ApplyReturnToDefaultMood(defaultMood, 600);
+            var finalMood = initialMood.ApplyReturnToDefaultMood(defaultMood, 600);
 
             // Assert
-            finalMood.Pleasure.Should().BeApproximately(1.0f, 1e-2f);
-            finalMood.Arousal.Should().BeApproximately(1.0f, 1e-2f);
-            finalMood.Dominance.Should().BeApproximately(0.26f, 1e-2f);
+            finalMood.Pleasure.Should().BeApproximately(1.0f - AlmaConstants.Sqrt3 / 2.0f, 1e-2f);
+            finalMood.Arousal.Should().BeApproximately(0, 1e-2f);
+            finalMood.Dominance.Should().BeApproximately(0, 1e-2f);
         }
     }
 }

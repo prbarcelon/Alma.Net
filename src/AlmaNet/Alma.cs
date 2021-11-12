@@ -5,6 +5,11 @@ using MathNet.Numerics.LinearAlgebra;
 
 namespace AlmaNet
 {
+    public static class AlmaConstants
+    {
+        public const float Sqrt3 = 1.7320508075688772935274463415059f;
+    }
+
     public static class Alma
     {
         public static PadModel ToPadModel(in this OceanModel o)
@@ -131,7 +136,7 @@ namespace AlmaNet
             // is 10 minutes."
             //
             // Gebhard, Patrick. (2005). ALMA: a layered model of affect. 29-36. 
-            const float speedOfMoodChange = 1.0f / (10 * 60); // 0.00167 units/second
+            const float moodChangeSpeed = 1.0f / (10 * 60); // 0.00167 units/second
 
             var emotionCenter = virtualEmotionCenter.Center.ToVector();
             var currentMood = mood.ToVector();
@@ -140,7 +145,7 @@ namespace AlmaNet
             {
                 // TODO - handle case where secondsElapsed is too high and pull overshoots center.
                 var pullDirection = emotionCenter.Subtract(currentMood).Normalize(2);
-                var pullAmount = speedOfMoodChange * secondsElapsed;
+                var pullAmount = moodChangeSpeed * secondsElapsed * virtualEmotionCenter.Intensity.Value;
                 var pullVector = pullDirection.Multiply(pullAmount);
                 var nextMood = currentMood.Add(pullVector).ToPadModel();
                 return nextMood;
@@ -148,7 +153,7 @@ namespace AlmaNet
             else
             {
                 var pushDirection = emotionCenter.Normalize(2);
-                var pushAmount = speedOfMoodChange * secondsElapsed;
+                var pushAmount = moodChangeSpeed * secondsElapsed * virtualEmotionCenter.Intensity.Value;
                 var pushVector = pushDirection.Multiply(pushAmount);
                 var nextMood = currentMood.Add(pushVector).ToPadModel();
                 return nextMood;
@@ -174,15 +179,14 @@ namespace AlmaNet
             // this is 20 minutes.
             //
             // Gebhard, Patrick. (2005). ALMA: a layered model of affect. 29-36.
-            const float sqrt3 = 1.7320508075688772935274463415059f;
-            const float speedOfMoodChange = sqrt3 / (20 * 60); // 0.00083 units/second
+            const float moodReturnSpeed = AlmaConstants.Sqrt3 / (20 * 60); // 0.00083 units/second
 
             var targetMood = defaultMood.ToVector();
             var currentMood = mood.ToVector();
 
             // TODO - handle case where secondsElapsed is too high and pull overshoots.
             var pullDirection = targetMood.Subtract(currentMood).Normalize(2);
-            var pullAmount = speedOfMoodChange * secondsElapsed;
+            var pullAmount = moodReturnSpeed * secondsElapsed;
             var pullVector = pullDirection.Multiply(pullAmount);
             var nextMood = currentMood.Add(pullVector).ToPadModel();
             return nextMood;
