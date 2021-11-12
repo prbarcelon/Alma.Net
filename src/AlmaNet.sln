@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlmaNet", "AlmaNet\AlmaNet.csproj", "{A2DF5A85-0FA9-4E2B-9E5F-155B17128F24}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlmaNet.Test", "AlmaNet.Test\AlmaNet.Test.csproj", "{2C34ECE7-1296-4AD7-B03D-3678F2223EF3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{A2DF5A85-0FA9-4E2B-9E5F-155B17128F24}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2DF5A85-0FA9-4E2B-9E5F-155B17128F24}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2DF5A85-0FA9-4E2B-9E5F-155B17128F24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C34ECE7-1296-4AD7-B03D-3678F2223EF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C34ECE7-1296-4AD7-B03D-3678F2223EF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C34ECE7-1296-4AD7-B03D-3678F2223EF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C34ECE7-1296-4AD7-B03D-3678F2223EF3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
