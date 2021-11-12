@@ -157,5 +157,23 @@ namespace AlmaNet.Test
             finalMood.Arousal.Should().BeApproximately(0, 1e-2f);
             finalMood.Dominance.Should().BeApproximately(0, 1e-2f);
         }
+
+        [Theory]
+        [InlineData(0.25f, -0.18f, 0.12f, MoodIntensity.Slightly, PadMoodOctants.Relaxed)]
+        [InlineData(0.38f, -0.08f, 0.50f, MoodIntensity.Moderately, PadMoodOctants.Relaxed)]
+        [InlineData(0.35f, 0.39f, 0.34f, MoodIntensity.Moderately, PadMoodOctants.Exuberant)]
+        public void ReturnMoodAndIntensity(float pleasure, float arousal, float dominance,
+            MoodIntensity expectedMoodIntensity, PadMoodOctants expectedPadMoodOctant)
+        {
+            // Arrange
+            var moodPadModel = new PadModel(pleasure, arousal, dominance);
+
+            // Act
+            var mood = moodPadModel.ToMood();
+
+            // Assert
+            mood.MoodType.Should().Be(expectedPadMoodOctant);
+            mood.Intensity.Should().Be(expectedMoodIntensity);
+        }
     }
 }

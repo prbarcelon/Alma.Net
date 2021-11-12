@@ -70,11 +70,11 @@ namespace AlmaNet
         }
 
         /// <summary>
-        ///     Converts the emotion to mood octants in PAD space.
+        /// Converts the emotion to mood octants in PAD space.
         /// </summary>
         /// <param name="emotion"></param>
         /// <returns></returns>
-        public static PadMoodOctants ToMood(this PadModel emotion)
+        public static Mood ToMood(this PadModel emotion)
         {
             var padMoodOctant = emotion switch
             {
@@ -91,7 +91,19 @@ namespace AlmaNet
                 _ => PadMoodOctants.Unknown
             };
 
-            return padMoodOctant;
+            // While using a three dimensional space with maximum absolute values of 1.0, the longest distance in a
+            // mood octant is √3. To use no numbers for describing strength, we divide the longest distance into three
+            // parts and call them: slightly, moderate, and fully.
+            const float partLength = AlmaConstants.Sqrt3 / 3.0f;
+            var emotionVectorLength = emotion.ToVector().L2Norm();
+            var moodIntensity = emotionVectorLength switch
+            {
+                var x when x <= partLength => MoodIntensity.Slightly,
+                var x when x <= partLength * 2.0 => MoodIntensity.Moderately,
+                _ => MoodIntensity.Fully
+            };
+
+            return new Mood(padMoodOctant, moodIntensity);
         }
 
         public static PadModel MapToPadSpace(this EmotionType emotion)
