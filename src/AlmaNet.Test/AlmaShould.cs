@@ -130,7 +130,7 @@ namespace AlmaNet.Test
         public void CalculateNewMood_WhenCurrentMoodIsInPushPhase()
         {
             // Arrange
-            var virtualEmotionCenter = new VirtualEmotionCenter(new PadModel(1.0f, 0, 0), new Intensity(0.5f));
+            var virtualEmotionCenter = new VirtualEmotionCenter(new PadModel(.25f, 0, 0), new Intensity(0.5f));
             var initialMood = new PadModel(0.5f, 0, 0);
 
             // Act
