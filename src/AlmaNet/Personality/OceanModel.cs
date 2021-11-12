@@ -17,5 +17,10 @@
         public float Extroversion { get; }
         public float Agreeableness { get; }
         public float Neuroticism { get; }
+
+        public override string ToString()
+        {
+            return $"O:{Openness}, C:{Conscientiousness}, E:{Extroversion}, A:{Agreeableness}, N:{Neuroticism}";
+        }
     }
 }

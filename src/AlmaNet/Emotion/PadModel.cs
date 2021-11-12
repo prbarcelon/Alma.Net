@@ -12,5 +12,10 @@
         public float Pleasure { get; }
         public float Arousal { get; }
         public float Dominance { get; }
+
+        public override string ToString()
+        {
+            return $"P:{Pleasure}, A:{Arousal}, D:{Dominance}";
+        }
     }
 }
