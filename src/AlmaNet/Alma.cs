@@ -32,16 +32,6 @@ namespace AlmaNet
             return padModel;
         }
 
-        public static PadModel[] ToPadModel(this OceanModel[] oceanModels)
-        {
-            var numberOfModels = oceanModels.Length;
-            var padModels = new PadModel[numberOfModels];
-            for (var i = 0; i < numberOfModels; i++)
-                padModels[i] = oceanModels[i].ToPadModel();
-
-            return padModels;
-        }
-
         /// <summary>
         ///     The virtual emotion center represents a point in the PAD space and has an intensity that is the average of all
         ///     active emotions’ intensity. Its maximum intensity is 1.0. If no active emotions exist, no virtual emotion center
