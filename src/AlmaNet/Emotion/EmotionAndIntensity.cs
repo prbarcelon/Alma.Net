@@ -10,5 +10,10 @@
 
         public EmotionType Emotion { get; }
         public Intensity Intensity { get; }
+
+        public override string ToString()
+        {
+            return $"{Intensity} {Emotion}";
+        }
     }
 }
