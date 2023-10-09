@@ -23,5 +23,10 @@ namespace AlmaNet
         {
             return value.Value;
         }
+
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
     }
 }
